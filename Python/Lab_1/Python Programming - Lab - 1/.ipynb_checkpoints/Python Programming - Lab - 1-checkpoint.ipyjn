@@ -1,0 +1,594 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a href='https://www.darshan.ac.in/'> <img src='https://www.darshan.ac.in/Content/media/DU_Logo.svg' width=\"250\" height=\"10\"/></a>\n",
+    "<pre>\n",
+    "<center><b><h1>Python Programming - 2301CS404</b></center>\n",
+    "<center><b><h1>Lab - 1</b></center>\n",
+    "<center> Kalp | 23010101133 | 29-11-24</center>\n",
+    "<pre>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 01) WAP to print “Hello World”"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Hello World\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Hello World\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 02) WAP to print addition of two numbers with and without using input()."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "30\n"
+     ]
+    }
+   ],
+   "source": [
+    "a = 10\n",
+    "b = 20\n",
+    "print(a+b)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter 1st number 1\n",
+      "Enter 2nd number 2\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3\n"
+     ]
+    }
+   ],
+   "source": [
+    "a = int(input(\"Enter 1st number\"))\n",
+    "b = int(input(\"Enter 2nd number\"))\n",
+    "print(a+b)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 03) WAP to check the type of the variable."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "int"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "a = 10\n",
+    "type(a)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 04) WAP to calculate simple interest."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter princiapl amount 100\n",
+      "Enter annual rate 1\n",
+      "Enter time period in years 1\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "p = int(input(\"Enter princiapl amount\"))\n",
+    "r = int(input(\"Enter annual rate\"))\n",
+    "t = int(input(\"Enter time period in years\"))\n",
+    "\n",
+    "sip = (p*r*t)/100\n",
+    "print(sip)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 05) WAP to calculate area and perimeter of a circle."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter radius if circle 100\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "628.0 31400.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "r = float(input(\"Enter radius if circle\"))\n",
+    "p = 2*3.14*r\n",
+    "a = 3.14*r*r\n",
+    "print(\"perimeter of Circle is\",end=\" \")\n",
+    "print(p)\n",
+    "print(\"Area of Circke is\",end=\" \")\n",
+    "print(a)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 06) WAP to calculate area of a triangle."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter base of triangle 10\n",
+      "Enter base of triangle 10\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Area of triangle is 50.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "base = float(input(\"Enter base of triangle\"))\n",
+    "alti = float(input(\"Enter base of triangle\"))\n",
+    "area = 0.5*base*alti\n",
+    "print(\"Area of triangle is\",end=\" \")\n",
+    "print(area)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 07) WAP to compute quotient and remainder."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1\n",
+      "2\n"
+     ]
+    }
+   ],
+   "source": [
+    "a=5\n",
+    "b=2\n",
+    "print(a%b)\n",
+    "print(a//b)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 08) WAP to convert degree into Fahrenheit and vice versa."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter degree in celcius 50\n",
+      "Enter degree in fahrenhite 100\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Temperature in Fahrenheit is : 122.0\n",
+      "Temperature in Celcius is : 37.77777777777778\n"
+     ]
+    }
+   ],
+   "source": [
+    "c = float(input(\"Enter degree in celcius\"))\n",
+    "f = float(input(\"Enter degree in fahrenhite\"))\n",
+    "\n",
+    "fah = (c*(9/5))+32\n",
+    "cel = (5/9)*(f-32)\n",
+    "print(\"Temperature in Fahrenheit is :\",fah)\n",
+    "print(\"Temperature in Celcius is :\",cel)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 09) WAP to find the distance between two points in 2-D space."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 09) WAP to find the distance between two points in 2-D space."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter value of x1 1\n",
+      "Enter value of x2 4\n",
+      "Enter value of y1 2\n",
+      "Enter value of y2 6\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Distance between two points is : 5.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "import math\n",
+    "x1 = int(input(\"Enter value of x1\"))\n",
+    "x2 = int(input(\"Enter value of x2\"))\n",
+    "y1 = int(input(\"Enter value of y1\"))\n",
+    "y2 = int(input(\"Enter value of y2\"))\n",
+    "\n",
+    "dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)\n",
+    "print(\"Distance between two points is :\",dist)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 10) WAP to print sum of n natural numbers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter a number: 5\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Sum of %n natural numbers is : 15.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "n = int(input(\"Enter a number:\"))\n",
+    "i=1\n",
+    "sum = 0\n",
+    "if i<=n:\n",
+    "    sum = n*(n+1)/2\n",
+    "    i = i+1\n",
+    "    print(\"Sum of first n natural numbers is :\",sum)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 11) WAP to print sum of square of n natural numbers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter day 2\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Sum of square of n natural number is : 5.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "n = int(input(\"Enter day\"))\n",
+    "sum = (n * (n + 1) * (2 * n + 1)) / 6\n",
+    "print(\"Sum of square of n natural number is :\",sum)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 12) WAP to concate the first and last name of the student."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter first name kalp\n",
+      "Enter last name Katba\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "kalp Katba\n"
+     ]
+    }
+   ],
+   "source": [
+    "fn = input(\"Enter first name\")\n",
+    "ln = input(\"Enter last name\")\n",
+    "print(fn+ln)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 13) WAP to swap two numbers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter a 4\n",
+      "Enter b 6\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "6 4\n"
+     ]
+    }
+   ],
+   "source": [
+    "a = int(input(\"Enter a\"))\n",
+    "b = int(input(\"Enter b\"))\n",
+    "temp = a\n",
+    "a = b\n",
+    "b = temp\n",
+    "\n",
+    "print(a,b)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 14) WAP to get the distance from user into kilometer, and convert it into meter, feet, inches and centimeter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter distance in Km :  1000\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Meter : 1000000\n",
+      "feet : 3280.84\n",
+      "inches : 39370100.0\n",
+      "Centimeters : 100000000\n"
+     ]
+    }
+   ],
+   "source": [
+    "km = int(input(\"Enter distance in Km : \"))\n",
+    "meter = km*1000\n",
+    "feet = km*3.28084\n",
+    "inches = km*1000*39.3701\n",
+    "cm = km*100000\n",
+    "print(\"Meter :\",meter)\n",
+    "print(\"feet :\",feet)\n",
+    "print(\"inches :\",inches)\n",
+    "print(\"Centimeters :\",cm)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 15) WAP to get day, month and year from the user and print the date in the given format: 23-11-2024."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      "Enter day,month,year 12\n",
+      "Enter month 11\n",
+      "Enter year 24\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "12-11-24\n"
+     ]
+    }
+   ],
+   "source": [
+    "d = int(input(\"Enter day\"))\n",
+    "m = int(input(\"Enter month\"))\n",
+    "y = int(input(\"Enter year\"))\n",
+    "\n",
+    "print(d,m,y, sep=\"-\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  },
+  "vscode": {
+   "interpreter": {
+    "hash": "31f2aee4e71d21fbe5cf8b01ff0e069b9275f58929596ceb00d14d90e3e16cd6"
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
