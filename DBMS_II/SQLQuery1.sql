@@ -535,6 +535,7 @@ VALUES
 					WHERE FirstName LIKE 'B%')
 
 	SELECT * FROM FUN_FIRSTNAME_()
+
 --5. Write a function which returns a table with unique first names from the person table.
 	CREATE OR ALTER FUNCTION FUN_FIRSTNAME_UNIQUE()
 	RETURNS TABLE
@@ -636,3 +637,148 @@ VALUES
 --13. Write a function which accepts two parameters year & month in integer and returns total days each year.
 --14. Write a function which accepts departmentID as a parameter & returns a detail of the persons.
 --15. Write a function that returns a table with details of all persons who joined after 1-1-1991.
+
+---------------------------------------Lab-6----------------------------------------------------------
+CREATE TABLE Products ( 
+Product_id INT PRIMARY KEY, 
+Product_Name VARCHAR(250) NOT NULL, 
+Price DECIMAL(10, 2) NOT NULL 
+);
+INSERT INTO Products (Product_id, Product_Name, Price) VALUES 
+(1, 'Smartphone', 35000), 
+(2, 'Laptop', 65000), 
+(3, 'Headphones', 5500), 
+(4, 'Television', 85000), 
+(5, 'Gaming Console', 32000); 
+--1. Create a cursor Product_Cursor to fetch all the rows from a products table.
+	DECLARE @Product_id INT,@Product_Name VARCHAR(250),@Price DECIMAL(10, 2);
+
+	DECLARE Product_Cursor CURSOR
+
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN Product_Cursor;
+	FETCH NEXT FROM Product_Cursor INTO @Product_id,@Product_Name,@Price;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		PRINT CAST(@Product_id AS VARCHAR)+'-'+@Product_Name+'-'+CAST(@Price AS VARCHAR);
+		FETCH NEXT FROM Product_Cursor INTO @Product_id,@Product_Name,@Price;
+	END
+	CLOSE Product_Cursor;
+	DEALLOCATE Product_Cursor;
+--2. Create a cursor Product_Cursor_Fetch to fetch the records in form of ProductID_ProductName.(Example: 1_Smartphone)
+	DECLARE @Product_id1 INT,@Product_Name1 VARCHAR(250)
+
+	DECLARE Product_Cursor_Fetch CURSOR
+	FOR SELECT Product_id,Product_Name FROM Products;
+	OPEN Product_Cursor_Fetch;
+	FETCH NEXT FROM Product_Cursor_Fetch INTO @Product_id1,@Product_Name1;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		PRINT CAST(@Product_id1 AS VARCHAR)+'_'+@Product_Name1;
+		FETCH NEXT FROM Product_Cursor_Fetch INTO @Product_id1,@Product_Name1;
+	END
+	CLOSE Product_Cursor_Fetch;
+	DEALLOCATE Product_Cursor_Fetch;
+--3. Create a Cursor to Find and Display Products Above Price 30,000. 
+	DECLARE @Product_id2 INT,@Product_Name2 VARCHAR(250),@Price2 DECIMAL(10, 2);
+
+	DECLARE Product_Cursor1 CURSOR
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN Product_Cursor1;
+	FETCH NEXT FROM Product_Cursor1 INTO @Product_id2,@Product_Name2,@Price2;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		IF @Price2>30000
+		BEGIN
+		PRINT CAST(@Product_id2 AS VARCHAR)+'-'+@Product_Name2+'-'+CAST(@Price2 AS VARCHAR);
+		END
+		FETCH NEXT FROM Product_Cursor1 INTO @Product_id2,@Product_Name2,@Price2;
+	END
+	CLOSE Product_Cursor1;
+	DEALLOCATE Product_Cursor1;
+--4. Create a cursor Product_CursorDelete that deletes all the data from the Products table.
+	DECLARE @PID INT;
+
+	DECLARE Product_DELETE CURSOR
+	FOR SELECT Product_id FROM Products;
+	OPEN Product_DELETE;
+	FETCH NEXT FROM Product_DELETE INTO @PID;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		DELETE FROM Products
+		FETCH NEXT FROM Product_DELETE INTO @PID;
+	END
+	CLOSE Product_DELETE;
+	DEALLOCATE Product_DELETE;
+-----------------------------------------------PART-B------------------------------------------
+--5. Create a cursor Product_CursorUpdate that retrieves all the data from the products table and increases the price by 10%. 
+	DECLARE @P_ID INT,@P_Name VARCHAR(250),@Price_ DECIMAL(10, 2);
+
+	DECLARE Product_CursoR_INC CURSOR
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN Product_CursoR_INC;
+	FETCH NEXT FROM Product_CursoR_INC INTO @P_ID,@P_Name,@Price_;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @Price_ = @Price_+ @Price_*0.1;
+		PRINT CAST(@P_ID AS VARCHAR)+'-'+@P_Name+'-'+CAST(@Price_ AS VARCHAR);
+		FETCH NEXT FROM Product_CursoR_INC INTO @P_ID,@P_Name,@Price_;
+	END
+	CLOSE Product_CursoR_INC;
+	DEALLOCATE Product_CursoR_INC;
+--6. Create a Cursor to Rounds the price of each product to the nearest whole number. 
+	DECLARE @P__ID INT,@P__NAME VARCHAR(250),@Price__ DECIMAL(10, 2);
+
+	DECLARE Product_Cursor_ROUND CURSOR
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN Product_Cursor_ROUND;
+	FETCH NEXT FROM Product_Cursor_ROUND INTO @P__ID,@P__NAME,@Price__;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		UPDATE Products
+		SET @Price__ = ROUND(@Price__,0) WHERE Product_id = @P__ID
+
+		FETCH NEXT FROM Product_Cursor_ROUND INTO @P__ID,@P__NAME,@Price__;
+	END
+	CLOSE Product_Cursor_ROUND;
+	DEALLOCATE Product_Cursor_ROUND;
+-----------------------------------------------PART-C-------------------------------------------
+--7. Create a cursor to insert details of Products into the NewProducts table if the product is “Laptop” (Note: Create NewProducts table first with same fields as Products table)
+	CREATE TABLE NPRODUCT ( 
+Product_id INT PRIMARY KEY, 
+Product_Name VARCHAR(250) NOT NULL, 
+Price DECIMAL(10, 2) NOT NULL 
+);
+	DECLARE @P__ID_ INT,@P__NAME_ VARCHAR(250),@_Price__ DECIMAL(10, 2);
+
+	DECLARE NProduct_Cursor CURSOR
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN NProduct_Cursor;
+	FETCH NEXT FROM NProduct_Cursor INTO @P__ID_,@P__NAME_,@_Price__;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		IF @P__NAME_ = 'LAPTOP'
+		BEGIN
+		INSERT INTO NPRODUCT VALUES(@P__ID_,@P__NAME_,@_Price__)
+		PRINT CAST(@P__ID_ AS VARCHAR)+'-'+@P__NAME_+'-'+CAST(@_Price__ AS VARCHAR);
+		END
+		FETCH NEXT FROM NProduct_Cursor INTO @P__ID_,@P__NAME_,@_Price__;
+	END
+	CLOSE NProduct_Cursor;
+	DEALLOCATE NProduct_Cursor;
+--8. Create a Cursor to Archive High-Price Products in a New Table (ArchivedProducts), Moves products with a price above 50000 to an archive table, removing them from the original Products table. 
+	DECLARE @P_ID_ INT,@P_NAME_ VARCHAR(250),@_Price_ DECIMAL(10, 2);
+
+	DECLARE Product_Cursor_ROUND CURSOR
+	FOR SELECT Product_id,Product_Name,Price FROM Products;
+	OPEN Product_Cursor_ROUND;
+	FETCH NEXT FROM Product_Cursor_ROUND INTO @P__ID,@P__NAME,@_Price_;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN 
+		UPDATE Products
+		SET @Price__ = ROUND(@Price__,0) WHERE Product_id = @P__ID
+
+		FETCH NEXT FROM Product_Cursor_ROUND INTO @P__ID,@P__NAME,@Price__;
+	END
+	CLOSE Product_Cursor_ROUND;
+	DEALLOCATE Product_Cursor_ROUND;
