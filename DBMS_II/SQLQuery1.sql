@@ -929,6 +929,9 @@ Price DECIMAL(10, 2) NOT NULL
 
 		SELECT @PERSONID = PERSONID FROM inserted
 		SELECT @PERSONNAME = PERSONNAME FROM inserted
+		INSERT INTO PERSONLOG
+		VALUES
+		(@PERSONID,@PERSONNAME,'DELETE',GETDATE())
 
 		UPDATE PERSONINFO
 		SET PERSONNAME = UPPER(@PERSONNAME)
@@ -937,21 +940,41 @@ Price DECIMAL(10, 2) NOT NULL
 	DROP TRIGGER TR_CONVERT_UPPERCASE
 
 	--5. Create trigger that prevent duplicate entries of person name on PersonInfo table.
-	CREATE TRIGGER TR_PREVENT_DUPLICATE
-	ON PERSONINFO
-	AFTER INSERT
-	AS 
-	BEGIN
-		
-	END	
-	DROP TRIGGER TR_CONVERT_UPPERCASE
+	Create Trigger TR_I_PERSONINFO_MESSAGE
+	On PersonInfo
+	INSTEAD OF Insert
+	As
+	Begin
+		Insert InTo PersonInfo
+		Select
+			PersonID,
+			PersonName,
+			Salary,
+			JoiningDate,
+			City,
+			Age ,
+			BirthDate 
+		From inserted
+		Where PersonName not in (Select PersonName from PersonInfo)
+	End
+	Drop Trigger TR_I_PERSONINFO_MESSAGE
 	
 	--6. Create trigger that prevent Age below 18 years. 
-	CREATE TRIGGER TR_AGE_BELOW_18
-	ON PERSONINFO
-	AFTER INSERT
-	AS 
-	BEGIN
-		INSERT INTO PERSONINFO(
-	END	
-	DROP TRIGGER TR_CONVERT_UPPERCASE
+	Create Trigger TR_I_PERSONINFO_MESSAGE
+	On PersonInfo
+	INSTEAD OF Insert
+	As
+	Begin
+		Insert InTo PersonInfo
+		Select
+			PersonID,
+			PersonName,
+			Salary,
+			JoiningDate,
+			City,
+			Age ,
+			BirthDate 
+		From inserted
+		Where Age > 18
+	End
+	Drop Trigger TR_I_PERSONINFO_MESSAGE
