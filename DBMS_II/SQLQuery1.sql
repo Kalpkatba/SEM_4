@@ -978,3 +978,230 @@ Price DECIMAL(10, 2) NOT NULL
 		Where Age > 18
 	End
 	Drop Trigger TR_I_PERSONINFO_MESSAGE
+	--Part – B 
+	--7. Create a trigger that fires on INSERT operation on person table, which calculates the age and update 
+	--that age in Person table. 
+		CREATE TRIGGER TR_UPDATE_AGE
+		ON PersonInfo
+		INSTEAD OF INSERT
+		AS BEGIN
+				DECLARE @PERSONID INT
+				DECLARE @PERSONNAME VARCHAR(50)
+				DECLARE @AGE INT
+				DECLARE @BIRTHDATE DATE
+
+				SELECT @BIRTHDATE = BIRTHDATE FROM INSERTED
+				SELECT @PERSONID = PERSONID FROM inserted
+				SELECT @PERSONNAME = PERSONNAME FROM inserted
+				INSERT INTO PERSONLOG
+				VALUES
+				(@PERSONID,@PERSONNAME,'INSERT',GETDATE())
+
+				UPDATE PERSONINFO
+				SET Age = DATEDIFF(YEAR,@BIRTHDATE,GETDATE())
+				WHERE PERSONID = @PERSONID
+		END
+		DROP TRIGGER TR_UPDATE_AGE
+	--8. Create a Trigger to Limit Salary Decrease by a 10%. 
+		CREATE TRIGGER TR_LIMIT_SALARYBY_10
+		ON PersonInfo
+		AFTER UPDATE
+		AS BEGIN
+				DECLARE @OLDSALARY DECIMAL(8,2)
+				DECLARE @PERID INT
+				DECLARE @NEWSALARY DECIMAL(8,2)
+
+				SELECT @OLDSALARY = SALARY FROM deleted
+				SELECT @PERID = PersonID FROM inserted
+				SELECT @NEWSALARY = SALARY FROM inserted
+
+				IF @NEWSALARY < @OLDSALARY * 0.9
+				BEGIN
+					UPDATE PersonInfo
+					SET Salary = @OLDSALARY
+					WHERE PersonID = @PERID
+				END
+		END
+		DROP TRIGGER TR_LIMIT_SALARYBY_10
+	--Part – C  
+	--9. Create Trigger to Automatically Update JoiningDate to Current Date on INSERT if JoiningDate is NULL 
+	--during an INSERT. 
+		CREATE TRIGGER TR_UPDATE_JOINDATE
+		ON PersonInfo
+		AFTER INSERT
+		AS BEGIN
+				DECLARE @JOINDATE DATE
+				DECLARE @PERID INT
+
+				SELECT @PERID = PERSONID FROM inserted
+				SELECT @JOINDATE = JoiningDate FROM inserted WHERE @PERID = PersonID
+
+				IF @JOINDATE = NULL
+				BEGIN
+					UPDATE PersonInfo
+					SET JoiningDate = GETDATE()
+					WHERE PersonID = @PERID
+				END
+		END
+		DROP TRIGGER TR_UPDATE_JOINDATE
+	--10. Create DELETE trigger on PersonLog table, when we delete any record of PersonLog table it prints 
+	--‘Record deleted successfully from PersonLog’.
+		CREATE OR ALTER TRIGGER TR_PRINT_MESSAGE_
+		ON PersonInfo
+		AFTER DELETE
+		AS 
+		BEGIN
+			PRINT('Record deleted successfully from PersonLog')
+		END
+		DROP TRIGGER TR_PRINT_MESSAGE_
+---------------------------EXTRA_TRIGGER_QUERIES---------------------------------------------
+CREATE TABLE EMPLOYEEDETAILS
+(
+	EmployeeID Int Primary Key,
+	EmployeeName Varchar(100) Not Null,
+	ContactNo Varchar(100) Not Null,
+	Department Varchar(100) Not Null,
+	Salary Decimal(10,2) Not Null,
+	JoiningDate DateTime Null
+)
+
+CREATE TABLE EmployeeLogs (
+    LogID INT PRIMARY KEY IDENTITY(1,1),
+    EmployeeID INT NOT NULL,
+    EmployeeName VARCHAR(100) NOT NULL,
+    ActionPerformed VARCHAR(100) NOT NULL,
+    ActionDate DATETIME NOT NULL
+);
+
+--1)	Create a trigger that fires AFTER INSERT, UPDATE, and DELETE operations on the EmployeeDetails table to display the message "Employee record inserted", "Employee record updated", "Employee record deleted"
+	CREATE TRIGGER TR_INSERT_
+	ON EMPLOYEEDETAILS
+	AFTER INSERT
+	AS 
+	BEGIN
+		PRINT('Employee record inserted')
+	END
+	DROP TRIGGER TR_INSERT_
+
+	CREATE TRIGGER TR_UPDATE_
+	ON EMPLOYEEDETAILS
+	AFTER UPDATE
+	AS 
+	BEGIN
+		PRINT('Employee record UPDATE')
+	END
+	DROP TRIGGER TR_UPDATE_
+
+	CREATE TRIGGER TR_DELETE_
+	ON EMPLOYEEDETAILS
+	AFTER DELETE
+	AS 
+	BEGIN
+		PRINT('Employee record DELETED')
+	END
+	DROP TRIGGER TR_DELETE_
+
+--2)	Create a trigger that fires AFTER INSERT, UPDATE, and DELETE operations on the EmployeeDetails table to log all operations into the EmployeeLog table.
+	CREATE TRIGGER TR_INSERT_AFTER
+	ON EMPLOYEEDETAILS
+	AFTER INSERT
+	AS 
+	BEGIN
+		DECLARE @EmployeeID INT
+		DECLARE @EmployeeName VARCHAR(50)
+		SELECT @EmployeeID = EmployeeID FROM inserted
+		SELECT @EmployeeName = EmployeeName FROM inserted
+
+		INSERT INTO EmployeeLogs
+		VALUES
+		(@EmployeeID,@EmployeeName,'INSERT',GETDATE())
+	END
+	DROP TRIGGER TR_INSERT_AFTER
+
+	CREATE TRIGGER TR_UPDATE_AFTER
+	ON EMPLOYEEDETAILS
+	AFTER UPDATE
+	AS 
+	BEGIN
+		DECLARE @EmployeeID INT
+		DECLARE @EmployeeName VARCHAR(50)
+		SELECT @EmployeeID = EmployeeID FROM inserted
+		SELECT @EmployeeName = EmployeeName FROM inserted
+		INSERT INTO EmployeeLogs
+		VALUES
+		(@EmployeeID,@EmployeeName,'UPDATE',GETDATE())
+	END
+	DROP TRIGGER TR_UPDATE_AFTER
+
+	CREATE TRIGGER TR_DELETE_AFTER
+	ON EMPLOYEEDETAILS
+	AFTER DELETE
+	AS 
+	BEGIN
+		DECLARE @EmployeeID INT
+		DECLARE @EmployeeName VARCHAR(50)
+		SELECT @EmployeeID = EmployeeID FROM inserted
+		SELECT @EmployeeName = EmployeeName FROM inserted
+		INSERT INTO EmployeeLogs
+		VALUES
+		(@EmployeeID,@EmployeeName,'DELETE',GETDATE())
+
+	END
+	DROP TRIGGER TR_DELETE_AFTER
+
+
+--3)	Create a trigger that fires AFTER INSERT to automatically calculate the joining bonus (10% of the salary) for new employees and update a bonus column in the EmployeeDetails table.
+		CREATE TRIGGER TR_BONUS_SALARY_BY_10
+		ON EMPLOYEEDETAILS
+		AFTER INSERT
+		AS BEGIN
+				DECLARE @SALARY DECIMAL(8,2)
+				DECLARE @EMPID INT
+
+				SELECT @SALARY = SALARY FROM deleted
+				SELECT @EMPID = EmployeeID FROM inserted
+
+				UPDATE PersonInfo
+				SET Salary = @SALARY + @SALARY*0.1
+				WHERE EmployeeID = @EMPID
+		END
+		DROP TRIGGER TR_BONUS_SALARY_BY_10
+
+--4)	Create a trigger to ensure that the JoiningDate is automatically set to the current date if it is NULL during an INSERT operation.
+		CREATE TRIGGER TR_JOINDATE_AUTOUPDATE
+		ON EMPLOYEEDETAILS
+		AFTER INSERT
+		AS BEGIN
+				DECLARE @JOINDATE DATE
+				DECLARE @EmployeeID INT
+
+				SELECT @EmployeeID = EmployeeID FROM inserted
+				SELECT @JOINDATE = JoiningDate FROM inserted WHERE EmployeeID = @EmployeeID
+
+				IF @JOINDATE = NULL
+				BEGIN
+					UPDATE EMPLOYEEDETAILS
+					SET JoiningDate = GETDATE()
+					WHERE EmployeeID = @EmployeeID
+				END
+		END
+		DROP TRIGGER TR_JOINDATE_AUTOUPDATE
+--5)	Create a trigger that ensure that ContactNo is valid during insert and update (Like ContactNo length is 10)
+		CREATE TRIGGER TR_CONTACT_VALIDATION
+		ON EMPLOYEEDETAILS
+		AFTER INSERT,UPDATE
+		AS BEGIN
+				DECLARE @CONTACT DECIMAL(10,0)
+				DECLARE @EmployeeID INT
+				DECLARE @EmployeeName VARCHAR(50)
+
+				SELECT @EmployeeName = EmployeeName FROM inserted
+				SELECT @CONTACT = ContactNo FROM inserted WHERE EmployeeID = @EmployeeID
+				IF LEN(@CONTACT) = 10
+				BEGIN
+					INSERT INTO EMPLOYEEDETAILS
+					VALUES
+					(@EmployeeID,@EmployeeName,'INSERT',GETDATE())
+				END
+		END
+		DROP TRIGGER TR_CONTACT_VALIDATION
