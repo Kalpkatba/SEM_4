@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_app/userlist.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class AddUser extends StatefulWidget {
   final Function(Map<String, dynamic>) onUserAdded;
   final List<Map<String, dynamic>> userList;
-  final Map<String, dynamic>? initialData;  // Add this
+  final Map<String, dynamic>? initialData; // Pre-fill data when editing
   final bool isEditing;
 
   const AddUser({
@@ -25,12 +29,34 @@ class _AddUserState extends State<AddUser> {
   TextEditingController phone = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController city = TextEditingController();
+  TextEditingController state = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController confirmPassword = TextEditingController();
+  String? phoneError;
+  String? emailError;
+
+  // State variables for toggling password visibility
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  String selectedGender = '';
+  String selectedCountryCode = '+91';
+  DateTime? selectedDOB;
+  List<String> hobbies = [
+    'Reading',
+    'Traveling',
+    'Sports',
+    'ESports',
+    'Music',
+    'Movies or Series'
+  ];
+  List<String> selectedHobbies = [];
 
   @override
   void initState() {
     super.initState();
     if (widget.initialData != null) {
-      // Pre-fill the form with existing data
+      // Pre-fill the form with existing data when editing
       name.text = widget.initialData!['name'];
       email.text = widget.initialData!['email'];
       String fullPhone = widget.initialData!['phone'];
@@ -38,20 +64,26 @@ class _AddUserState extends State<AddUser> {
       phone.text = fullPhone.split(' ')[1];
       address.text = widget.initialData!['address'];
       city.text = widget.initialData!['city'];
+      state.text = widget.initialData!['state'];
       selectedGender = widget.initialData!['gender'];
       selectedDOB = DateFormat('dd/MM/yyyy').parse(widget.initialData!['dob']);
       selectedHobbies = widget.initialData!['hobbies'].split(', ');
     }
   }
 
-  String selectedGender = '';
-  String selectedCountryCode = '+91';
-  DateTime? selectedDOB;
-  List<String> hobbies = ['Reading', 'Traveling', 'Sports', 'Music'];
-  List<String> selectedHobbies = [];
-  List<Map<String, dynamic>> userList = [];
+  @override
+  void dispose() {
+    name.dispose();
+    email.dispose();
+    phone.dispose();
+    address.dispose();
+    city.dispose();
+    state.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+    super.dispose();
+  }
 
-  List<String> countryCodes = ['+1', '+44', '+91', '+61', '+81'];
   void addUser() {
     if (validateInputs()) {
       final newUser = {
@@ -60,24 +92,24 @@ class _AddUserState extends State<AddUser> {
         'phone': '$selectedCountryCode ${phone.text}',
         'address': address.text,
         'city': city.text,
+        'state': state.text,
         'gender': selectedGender,
         'dob': DateFormat('dd/MM/yyyy').format(selectedDOB!),
         'age': calculateAge(selectedDOB!),
         'hobbies': selectedHobbies.join(', '),
       };
 
+      // Only add password if not editing
+      if (!widget.isEditing) {
+        newUser['password'] = password.text;
+      }
+
       widget.onUserAdded(newUser);
       clearFields();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User added successfully!')),
+        const SnackBar(content: Text('User added successfully!')),
       );
     }
-  }
-
-  void deleteUser(int index) {
-    setState(() {
-      userList.removeAt(index);
-    });
   }
 
   bool validateInputs() {
@@ -123,6 +155,19 @@ class _AddUserState extends State<AddUser> {
       return false;
     }
 
+    // Validate password only when adding a new user
+    if (!widget.isEditing) {
+      if (password.text.isEmpty || password.text.length < 6) {
+        showError('Password must be at least 6 characters long.');
+        return false;
+      }
+
+      if (password.text != confirmPassword.text) {
+        showError('Passwords do not match.');
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -130,12 +175,12 @@ class _AddUserState extends State<AddUser> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -158,49 +203,214 @@ class _AddUserState extends State<AddUser> {
     phone.clear();
     address.clear();
     city.clear();
+    state.clear();
     selectedGender = '';
     selectedDOB = null;
     selectedHobbies.clear();
     selectedCountryCode = '+91';
+    if (!widget.isEditing) {
+      password.clear();
+      confirmPassword.clear();
+    }
   }
+  // Import for InputFormatter
 
   Widget buildForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildTextField('Name', name),
-        SizedBox(height: 10),
-        buildTextField('Email', email),
-        SizedBox(height: 10),
-        buildTextField('Phone', phone),
-        SizedBox(height: 10),
-        buildTextField('Address', address),
-        SizedBox(height: 10),
-        buildTextField('City', city),
-        SizedBox(height: 10),
+        buildTextField('Name', name, 'Enter your full name'),
+        const SizedBox(height: 10),
+        // Modify the email TextField to use TextInputType.emailAddress
+        TextField(
+          controller: email,
+          keyboardType: TextInputType.emailAddress, // Set keyboard type for email
+          decoration: InputDecoration(
+            labelText: 'Email',
+            hintText: 'Enter your email address',
+            labelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Pacifico',
+            ),
+            prefixIcon: const Icon(Icons.email),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.all(Radius.circular(21)),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(21),
+            ),
+            errorText: emailError, // Shows validation error if any
+          ),
+          onChanged: (value) {
+            setState(() {
+              // Add your validation logic for email here
+              if (value.isEmpty) {
+                emailError = "Please enter an email address";
+              } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                emailError = "Enter a valid email address";
+              } else {
+                emailError = null; // Clear error if input is valid
+              }
+            });
+          },
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: phone,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Restricts to numbers only
+          decoration: InputDecoration(
+            labelText: 'Phone',
+            hintText: 'Enter your phone number',
+            labelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Pacifico',
+            ),
+            prefixIcon: const Icon(Icons.phone),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.black),
+              borderRadius: BorderRadius.all(Radius.circular(21)),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(21),
+            ),
+            errorText: phoneError, // Shows validation error if any
+          ),
+          onChanged: (value) {
+            setState(() {
+              if (value.isEmpty) {
+                phoneError = "Please enter a phone number";
+              } else if (value.length == 11) {
+                phoneError = "Enter a valid phone number (10 digits)";
+              } else {
+                phoneError = null; // Clear error if input is valid
+              }
+            });
+          },
+        ),
+        const SizedBox(height: 10),
+        if (!widget.isEditing) ...[
+          buildPasswordField('Password', password, 'Enter a strong password'),
+          const SizedBox(height: 10),
+          buildPasswordField(
+              'Confirm Password', confirmPassword, 'Re-enter your password'),
+          const SizedBox(height: 10),
+        ],
+        buildTextField('Address', address, 'Enter your address'),
+        const SizedBox(height: 10),
+        buildTextField('City', city, 'Enter your city'),
+        const SizedBox(height: 10),
+        buildTextField('State', state, 'Enter your state'),
+        const SizedBox(height: 10),
         buildGenderSelector(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         buildDatePicker(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         buildHobbiesSelector(),
       ],
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller) {
+
+    Widget buildModernButton(String text, VoidCallback onPressed,
+      {Color? color}) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1A253F), Color(0xFF1A253F)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(
+      String label, TextEditingController controller, String hintText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         TextField(
           controller: controller,
           decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.grey.shade800),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(21),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Modified buildPasswordField with toggle eye icon
+  Widget buildPasswordField(
+      String label, TextEditingController controller, String hintText) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          obscureText:
+              label == 'Password' ? _obscurePassword : _obscureConfirmPassword,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors.black),
+            suffixIcon: IconButton(
+              icon: Icon(
+                label == 'Password'
+                    ? (_obscurePassword
+                        ? Icons.visibility
+                        : Icons.visibility_off)
+                    : (_obscureConfirmPassword
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                color: Colors.black,
+              ),
+              onPressed: () {
+                setState(() {
+                  if (label == 'Password') {
+                    _obscurePassword = !_obscurePassword;
+                  } else {
+                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                  }
+                });
+              },
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(21),
+              borderSide: const BorderSide(color: Colors.white24, width: 2),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(21),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
             ),
           ),
         ),
@@ -212,46 +422,44 @@ class _AddUserState extends State<AddUser> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Gender:',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        Row(
+        SizedBox(height: 10),
+        ToggleButtons(
+          isSelected: [
+            selectedGender == "Male",
+            selectedGender == "Female"
+          ],
+          onPressed: (int index) {
+            setState(() {
+              selectedGender = index == 0 ? "Male" : "Female";
+            });
+          },
+          borderRadius: BorderRadius.circular(21),
+          selectedColor: Colors.white,
+          fillColor: Color(0xFF1A253F), // Highlight color for selected button
+          color: Colors.black, // Text color for unselected
           children: [
-            Expanded(
-              child: RadioListTile<String>(
-                value: 'Male',
-                groupValue: selectedGender,
-                title: Text('Male'),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGender = value!;
-                  });
-                },
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Icon(Icons.male, color: selectedGender == "Male" ? Colors.white : Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Male'),
+                ],
               ),
             ),
-            Expanded(
-              child: RadioListTile<String>(
-                value: 'Female',
-                groupValue: selectedGender,
-                title: Text('Female'),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGender = value!;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: RadioListTile<String>(
-                value: 'Other',
-                groupValue: selectedGender,
-                title: Text('Other'),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGender = value!;
-                  });
-                },
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Icon(Icons.female, color: selectedGender == "Female" ? Colors.white : Colors.pink),
+                  SizedBox(width: 8),
+                  Text('Female'),
+                ],
               ),
             ),
           ],
@@ -260,47 +468,102 @@ class _AddUserState extends State<AddUser> {
     );
   }
 
+
   Widget buildDatePicker() {
-    return Row(
-      children: [
-        Text('DOB:'),
-        TextButton(
-          onPressed: () async {
-            DateTime? date = await showDatePicker(
-              context: context,
-              initialDate: selectedDOB ?? DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
+    return GestureDetector(
+      onTap: () async {
+        DateTime? date = await showDatePicker(
+          context: context,
+          initialDate: selectedDOB ?? DateTime.now(),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+          builder: (context, child) {
+            return Theme(
+              data: ThemeData.light().copyWith(
+                primaryColor: const Color(0xFF2E3A59),
+                hintColor: const Color(0xFF1A253F),
+                colorScheme:
+                    const ColorScheme.light(primary: Color(0xFF2E3A59)),
+                buttonTheme:
+                    ButtonThemeData(textTheme: ButtonTextTheme.primary),
+              ),
+              child: child!,
             );
-            if (date != null) {
-              setState(() {
-                selectedDOB = date;
-              });
-            }
           },
-          child: Text(selectedDOB == null
-              ? 'Select Date'
-              : DateFormat('dd/MM/yyyy').format(selectedDOB!)),
+        );
+        if (date != null) {
+          setState(() {
+            selectedDOB = date;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.pink, Color(0xFF1A253F)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: const Offset(2, 2),
+            ),
+          ],
         ),
-      ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              selectedDOB == null
+                  ? 'Select Date of Birth'
+                  : DateFormat('dd/MM/yyyy').format(selectedDOB!),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Icon(Icons.calendar_today, color: Colors.white),
+          ],
+        ),
+      ),
     );
   }
 
   Widget buildHobbiesSelector() {
-    return Column(
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 8.0,
       children: hobbies.map((hobby) {
-        return CheckboxListTile(
-          value: selectedHobbies.contains(hobby),
-          title: Text(hobby),
-          onChanged: (value) {
+        bool isSelected = selectedHobbies.contains(hobby);
+        return ChoiceChip(
+          label: Text(
+            hobby,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          selected: isSelected,
+          onSelected: (selected) {
             setState(() {
-              if (value == true) {
+              if (selected) {
                 selectedHobbies.add(hobby);
               } else {
                 selectedHobbies.remove(hobby);
               }
             });
           },
+          checkmarkColor: Colors.green,
+          backgroundColor: const Color(0xFF1A253F),
+          selectedColor: const Color(0xFF1A253F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
         );
       }).toList(),
     );
@@ -310,36 +573,72 @@ class _AddUserState extends State<AddUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Add User',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.red,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Container(
+          child: Row(
             children: [
-              buildForm(),
-              SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: addUser,
-                  child: Text('Submit'),
-                ),
+              const Icon(
+                Icons.person_add,
+                color: Colors.white,
+                size: 30,
               ),
-              SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Back'),
+              const SizedBox(width: 15),
+              Text(
+                widget.isEditing ? 'Edit User' : 'Add User',
+                style: TextStyle(
+                  fontFamily: GoogleFonts.pacifico().fontFamily,
+                  fontSize: 25,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3,
                 ),
               ),
             ],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.pink, Color(0xFF1A253F)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildForm(),
+                const SizedBox(height: 20),
+                buildModernButton(
+                  widget.isEditing ? 'Update' : 'Submit',
+                      () {
+                    if (validateInputs()) {
+                      addUser();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Userlist()),
+                      );
+                    } else {
+                      // Optionally, show an error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please correct the errors before proceeding.')),
+                      );
+                    }
+                  },
+                ),
+
+                // const SizedBox(height: 16),
+                // buildModernButton('Back', () => Navigator.pop(context)),
+              ],
+            ),
           ),
         ),
       ),
